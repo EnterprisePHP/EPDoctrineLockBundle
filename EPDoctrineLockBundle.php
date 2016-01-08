@@ -1,9 +1,9 @@
 <?php
 
-namespace EP\DisplayBundle;
+namespace EP\DoctrineLockBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class EPDisplayBundle extends Bundle
+class EPDoctrineLockBundle extends Bundle
 {
 }

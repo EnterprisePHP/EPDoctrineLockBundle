@@ -1,0 +1,22 @@
+EP\DoctrineLockBundle\Entity\ObjectLock:
+  type: entity
+  table: ep_object_lock
+  repositoryClass: EP\DoctrineLockBundle\Entity\ObjectLockRepository
+  id:
+    id:
+      type: integer
+      id: true
+      generator:
+        strategy: AUTO
+  fields:
+    objectClass:
+      column: object_class
+      type: string
+      length: 255
+      nullable: false
+    insertLocked:
+      type: boolean
+    updateLocked:
+      type: boolean
+    deleteLocked:
+      type: boolean
