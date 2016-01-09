@@ -1,7 +1,14 @@
 parameters:
   ep.doctrine.object.locker.class: EP\DoctrineLockBundle\Service\ObjectLocker
+  ep.doctrine.event.subscriber.class: EP\DoctrineLockBundle\EventListener\DoctrineEventSubscriber
 
 services:
   ep.doctrine.object.locker:
     class: "%ep.doctrine.object.locker.class%"
     arguments: ["@doctrine.orm.entity_manager", "@property_accessor"]
+
+  ep.doctrine.event.subscriber:
+    class: "%ep.doctrine.event.subscriber.class%"
+    arguments: ["@property_accessor"]
+    tags:
+      - { name: doctrine.event_subscriber }
