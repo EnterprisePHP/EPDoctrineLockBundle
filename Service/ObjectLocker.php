@@ -103,6 +103,7 @@ class ObjectLocker
     {
         $objectLock = new ObjectLock();
         $objectLock
+            ->setObjectClass($objectClassName)
             ->setFullLocked(false)
             ->setInsertLocked(false)
             ->setUpdateLocked(false)
