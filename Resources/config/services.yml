@@ -1,1 +1,7 @@
+parameters:
+  ep.doctrine.object.locker.class: EP\DoctrineLockBundle\Service\ObjectLocker
+
 services:
+  ep.doctrine.object.locker:
+    class: "%ep.doctrine.object.locker.class%"
+    arguments: ["@doctrine.orm.entity_manager", "@property_accessor"]

@@ -78,6 +78,8 @@ class ObjectLock
     public function setFullLocked($fullLocked)
     {
         $this->fullLocked = $fullLocked;
+
+        return $this;
     }
 
     /**
@@ -90,10 +92,13 @@ class ObjectLock
 
     /**
      * @param boolean $insertLocked
+     * @return $this
      */
     public function setInsertLocked($insertLocked)
     {
         $this->insertLocked = $insertLocked;
+
+        return $this;
     }
 
     /**
@@ -106,10 +111,13 @@ class ObjectLock
 
     /**
      * @param boolean $updateLocked
+     * @return $this
      */
     public function setUpdateLocked($updateLocked)
     {
         $this->updateLocked = $updateLocked;
+
+        return $this;
     }
 
     /**
@@ -122,9 +130,12 @@ class ObjectLock
 
     /**
      * @param boolean $deleteLocked
+     * @return $this
      */
     public function setDeleteLocked($deleteLocked)
     {
         $this->deleteLocked = $deleteLocked;
+
+        return $this;
     }
 }
