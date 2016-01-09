@@ -5,6 +5,7 @@ namespace EP\DoctrineLockBundle\EventListener;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use EP\DoctrineLockBundle\Entity\ObjectLock;
+use EP\DoctrineLockBundle\Exception\LockedEntityException;
 use EP\DoctrineLockBundle\Exception\LockedObjectException;
 use EP\DoctrineLockBundle\Params\ObjectLockParams;
 use EP\DoctrineLockBundle\Service\ObjectLocker;
@@ -67,7 +68,7 @@ class DoctrineEventSubscriber implements EventSubscriber
 
     /**
      * @param LifecycleEventArgs $args
-     * @return void
+     * @throws LockedEntityException
      * @throws LockedObjectException
      */
     public function preRemove(LifecycleEventArgs $args)
@@ -88,12 +89,18 @@ class DoctrineEventSubscriber implements EventSubscriber
         if($isInsertLocked){
             throw new LockedObjectException('You tried delete entity an delete locked object');
         }
+        if(!$this->isLockableEntity($entity)){
+            return;
+        }
+        if($entity->isDeleteLocked()){
+            throw new LockedEntityException('You tried delete row that delete locked entity');
+        }
         return;
     }
 
     /**
      * @param LifecycleEventArgs $args
-     * @return void
+     * @throws LockedEntityException
      * @throws LockedObjectException
      */
     public function preUpdate(LifecycleEventArgs $args)
@@ -109,9 +116,15 @@ class DoctrineEventSubscriber implements EventSubscriber
         if($isFullLocked){
             throw new LockedObjectException('You tried update row an fully locked object');
         }
-        $isInsertLocked = $objectLocker->isLocked($entity, ObjectLockParams::UPDATE_LOCK);
-        if($isInsertLocked){
+        $isUpdateLocked = $objectLocker->isLocked($entity, ObjectLockParams::UPDATE_LOCK);
+        if($isUpdateLocked){
             throw new LockedObjectException('You tried update row an update locked object');
+        }
+        if(!$this->isLockableEntity($entity)){
+            return;
+        }
+        if($entity->isUpdateLocked()){
+            throw new LockedEntityException('You tried update row an update locked entity');
         }
         return;
     }
@@ -137,6 +150,24 @@ class DoctrineEventSubscriber implements EventSubscriber
         if($lockableAnnotation !== null){
             $this->mapLockable($classMetadata);
         }
+    }
+
+    /**
+     * @param $entity
+     * @return bool
+     */
+    private function isLockableEntity($entity)
+    {
+        $reader = new AnnotationReader();
+        $reflClass = new \ReflectionClass($entity);
+        $lockableAnnotation = $reader->getClassAnnotation($reflClass, 'EP\\DoctrineLockBundle\\Annotations\\Lockable');
+        if($lockableAnnotation == null){
+            return false;
+        }
+        if(!method_exists($entity, 'isUpdateLocked') || !method_exists($entity, 'isDeleteLocked')){
+            throw new \LogicException('Please use Lockable trait on '. $reflClass->getName());
+        }
+        return true;
     }
 
     /**
