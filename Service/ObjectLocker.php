@@ -97,6 +97,22 @@ class ObjectLocker
 
     /**
      * @param $object
+     * @param string $lockType
+     * @return boolean
+     * @throws \Exception
+     */
+    public function isLocked($object, $lockType = ObjectLockParams::FULL_LOCK)
+    {
+        $objectClassName = $this->getObjectClassName($object);
+        $objectDetail = $this->getObjectDetail($objectClassName);
+        if(!$objectDetail){
+            $objectDetail = $this->setupObjectDetail($objectClassName);
+        }
+        return $this->accessor->getValue($objectDetail, $lockType);
+    }
+
+    /**
+     * @param $object
      * @return string
      * @throws MappingException
      * @throws \Exception
