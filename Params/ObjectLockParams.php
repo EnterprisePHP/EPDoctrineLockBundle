@@ -4,8 +4,8 @@ namespace EP\DoctrineLockBundle\Params;
 
 class ObjectLockParams
 {
-    const FULL_LOCK = 'fullLock';
-    const INSERT_LOCK = 'insertLock';
-    const UPDATE_LOCK = 'updateLock';
-    const DELETE_LOCK = 'deleteLock';
+    const FULL_LOCK = 'fullLocked';
+    const INSERT_LOCK = 'insertLocked';
+    const UPDATE_LOCK = 'updateLocked';
+    const DELETE_LOCK = 'deleteLocked';
 }
