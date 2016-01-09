@@ -8,8 +8,11 @@ use EP\DoctrineLockBundle\Entity\ObjectLock;
 use EP\DoctrineLockBundle\Exception\LockedObjectException;
 use EP\DoctrineLockBundle\Params\ObjectLockParams;
 use EP\DoctrineLockBundle\Service\ObjectLocker;
-use EP\DoctrineLockBundle\Service\ObjectLockerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Events;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Common\Annotations\AnnotationReader;
 
 class DoctrineEventSubscriber implements EventSubscriber
 {
@@ -30,22 +33,23 @@ class DoctrineEventSubscriber implements EventSubscriber
     public function getSubscribedEvents()
     {
         return [
-            'prePersist',
-            'preRemove',
-            'preUpdate',
+            Events::prePersist,
+            Events::preRemove,
+            Events::preUpdate,
+            Events::loadClassMetadata,
         ];
     }
 
     /**
      * @param LifecycleEventArgs $args
-     * @return bool
+     * @return void
      * @throws LockedObjectException
      */
     public function prePersist(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
         if($entity instanceof ObjectLock){
-            return $args;
+            return;
         }
         $em = $args->getEntityManager();
         $objectLocker = new ObjectLocker($em, $this->accessor);
@@ -58,19 +62,19 @@ class DoctrineEventSubscriber implements EventSubscriber
         if($isInsertLocked){
             throw new LockedObjectException('You tried insert row an insert locked object');
         }
-        return true;
+        return;
     }
 
     /**
      * @param LifecycleEventArgs $args
-     * @return bool
+     * @return void
      * @throws LockedObjectException
      */
     public function preRemove(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
         if($entity instanceof ObjectLock){
-            return true;
+            return;
         }
 
         $em = $args->getEntityManager();
@@ -84,19 +88,19 @@ class DoctrineEventSubscriber implements EventSubscriber
         if($isInsertLocked){
             throw new LockedObjectException('You tried delete entity an delete locked object');
         }
-        return true;
+        return;
     }
 
     /**
      * @param LifecycleEventArgs $args
-     * @return bool
+     * @return void
      * @throws LockedObjectException
      */
     public function preUpdate(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
         if($entity instanceof ObjectLock){
-            return true;
+            return;
         }
         $em = $args->getEntityManager();
         $objectLocker = new ObjectLocker($em, $this->accessor);
@@ -109,6 +113,57 @@ class DoctrineEventSubscriber implements EventSubscriber
         if($isInsertLocked){
             throw new LockedObjectException('You tried update row an update locked object');
         }
-        return true;
+        return;
+    }
+
+    /**
+     * Add mapping to lockable entities
+     *
+     * @param LoadClassMetadataEventArgs $eventArgs
+     * @return void
+     */
+    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
+    {
+        $reader = new AnnotationReader();
+        /** @var ClassMetadata $classMetadata */
+        $classMetadata = $eventArgs->getClassMetadata();
+        /** @var \ReflectionClass $reflClass */
+        $reflClass = $classMetadata->reflClass;
+
+        if (!$reflClass || $reflClass->isAbstract()) {
+            return;
+        }
+        $lockableAnnotation = $reader->getClassAnnotation($reflClass, 'EP\\DoctrineLockBundle\\Annotations\\Lockable');
+        if($lockableAnnotation !== null){
+            $this->mapLockable($classMetadata);
+        }
+    }
+
+    /**
+     * map lockable fields if not mapped
+     *
+     * @param ClassMetadata $classMetadata
+     */
+    private function mapLockable(ClassMetadata $classMetadata)
+    {
+        // Map update lock field
+        if (!$classMetadata->hasField('updateLocked')) {
+            $classMetadata->mapField(
+                array(
+                    'fieldName' => 'updateLocked',
+                    'type' => 'boolean',
+                )
+            );
+        }
+
+        // Map delete lock field
+        if (!$classMetadata->hasField('deleteLocked')) {
+            $classMetadata->mapField(
+                array(
+                    'fieldName' => 'deleteLocked',
+                    'type' => 'boolean',
+                )
+            );
+        }
     }
 }
