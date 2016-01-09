@@ -4,7 +4,7 @@ namespace EP\DoctrineLockBundle\Service;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\MappingException;
-use EP\DoctrineLockBundle\Params\ObjectLockerParams;
+use EP\DoctrineLockBundle\Params\ObjectLockParams;
 use EP\DoctrineLockBundle\Entity\ObjectLock;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -31,7 +31,7 @@ class ObjectLocker
         $this->accessor = $accessor;
     }
 
-    public function lock($object, $lockType = ObjectLockerParams::FULL_LOCK)
+    public function lock($object, $lockType = ObjectLockParams::FULL_LOCK)
     {
         $objectClassName = $this->getObjectClassName($object);
         $objectDetail = $this->getObjectDetail($objectClassName);
@@ -45,7 +45,7 @@ class ObjectLocker
         return true;
     }
 
-    public function unlock($object, $lockType = ObjectLockerParams::FULL_LOCK)
+    public function unlock($object, $lockType = ObjectLockParams::FULL_LOCK)
     {
         $objectClassName = $this->getObjectClassName($object);
         $objectDetail = $this->getObjectDetail($objectClassName);
@@ -59,7 +59,7 @@ class ObjectLocker
         return true;
     }
 
-    public function switchLock($object, $lockType = ObjectLockerParams::FULL_LOCK)
+    public function switchLock($object, $lockType = ObjectLockParams::FULL_LOCK)
     {
         $objectClassName = $this->getObjectClassName($object);
         $objectDetail = $this->getObjectDetail($objectClassName);

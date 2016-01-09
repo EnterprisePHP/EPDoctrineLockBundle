@@ -2,7 +2,7 @@
 
 namespace EP\DoctrineLockBundle\Params;
 
-class ObjectLockerParams
+class ObjectLockParams
 {
     const FULL_LOCK = 'fullLock';
     const INSERT_LOCK = 'insertLock';
