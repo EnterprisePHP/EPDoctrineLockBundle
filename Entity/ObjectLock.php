@@ -7,7 +7,6 @@ namespace EP\DoctrineLockBundle\Entity;
  */
 class ObjectLock
 {
-
     /**
      * @var int
      */
@@ -17,6 +16,11 @@ class ObjectLock
      * @var  string
      */
     protected $objectClass;
+
+    /**
+     * @var bool
+     */
+    protected $fullLocked = false;
 
     /**
      * @var bool
@@ -58,6 +62,22 @@ class ObjectLock
         $this->objectClass = $objectClass;
 
         return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isFullLocked()
+    {
+        return $this->fullLocked;
+    }
+
+    /**
+     * @param boolean $fullLocked
+     */
+    public function setFullLocked($fullLocked)
+    {
+        $this->fullLocked = $fullLocked;
     }
 
     /**

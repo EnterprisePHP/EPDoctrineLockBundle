@@ -14,6 +14,8 @@ EP\DoctrineLockBundle\Entity\ObjectLock:
       type: string
       length: 255
       nullable: false
+    fullLocked:
+      type: boolean
     insertLocked:
       type: boolean
     updateLocked:
