@@ -18,17 +18,17 @@ class ObjectLocker
     /**
      * @var PropertyAccessorInterface
      */
-    private $propertyAccessor;
+    private $accessor;
 
     /**
      * ObjectLocker constructor.
      * @param EntityManager $em
-     * @param PropertyAccessorInterface $propertyAccessor
+     * @param PropertyAccessorInterface $accessor
      */
-    public function __construct(EntityManager $em, PropertyAccessorInterface $propertyAccessor)
+    public function __construct(EntityManager $em, PropertyAccessorInterface $accessor)
     {
         $this->em = $em;
-        $this->propertyAccessor = $propertyAccessor;
+        $this->accessor = $accessor;
     }
 
     public function lock($object, $lockType = ObjectLockerParams::FULL_LOCK)
@@ -38,7 +38,7 @@ class ObjectLocker
         if(!$objectDetail){
             $objectDetail = $this->setupObjectDetail($objectClassName);
         }
-        $this->propertyAccessor->setValue($objectDetail, $lockType, true);
+        $this->accessor->setValue($objectDetail, $lockType, true);
         $this->em->persist($objectDetail);
         $this->em->flush();
 
@@ -52,7 +52,7 @@ class ObjectLocker
         if(!$objectDetail){
             $objectDetail = $this->setupObjectDetail($objectClassName);
         }
-        $this->propertyAccessor->setValue($objectDetail, $lockType, false);
+        $this->accessor->setValue($objectDetail, $lockType, false);
         $this->em->persist($objectDetail);
         $this->em->flush();
 
@@ -66,10 +66,10 @@ class ObjectLocker
         if(!$objectDetail){
             $objectDetail = $this->setupObjectDetail($objectClassName);
         }
-        if($this->propertyAccessor->getValue($objectDetail, $lockType) === true){
-            $this->propertyAccessor->setValue($objectDetail, $lockType, false);
+        if($this->accessor->getValue($objectDetail, $lockType) === true){
+            $this->accessor->setValue($objectDetail, $lockType, false);
         }else{
-            $this->propertyAccessor->setValue($objectDetail, $lockType, true);
+            $this->accessor->setValue($objectDetail, $lockType, true);
         }
         $this->em->persist($objectDetail);
         $this->em->flush();
