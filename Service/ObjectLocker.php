@@ -31,6 +31,12 @@ class ObjectLocker
         $this->accessor = $accessor;
     }
 
+    /**
+     * @param $object
+     * @param string $lockType
+     * @return bool
+     * @throws \Exception
+     */
     public function lock($object, $lockType = ObjectLockParams::FULL_LOCK)
     {
         $objectClassName = $this->getObjectClassName($object);
@@ -45,6 +51,12 @@ class ObjectLocker
         return true;
     }
 
+    /**
+     * @param $object object
+     * @param string $lockType
+     * @return bool
+     * @throws \Exception
+     */
     public function unlock($object, $lockType = ObjectLockParams::FULL_LOCK)
     {
         $objectClassName = $this->getObjectClassName($object);
@@ -59,6 +71,12 @@ class ObjectLocker
         return true;
     }
 
+    /**
+     * @param $object
+     * @param string $lockType
+     * @return bool
+     * @throws \Exception
+     */
     public function switchLock($object, $lockType = ObjectLockParams::FULL_LOCK)
     {
         $objectClassName = $this->getObjectClassName($object);
@@ -77,6 +95,12 @@ class ObjectLocker
         return true;
     }
 
+    /**
+     * @param $object
+     * @return string
+     * @throws MappingException
+     * @throws \Exception
+     */
     private function getObjectClassName($object)
     {
         try {
@@ -99,6 +123,10 @@ class ObjectLocker
         ]);
     }
 
+    /**
+     * @param $objectClassName string
+     * @return ObjectLock
+     */
     private function setupObjectDetail($objectClassName)
     {
         $objectLock = new ObjectLock();

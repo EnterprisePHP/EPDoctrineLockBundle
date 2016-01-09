@@ -74,6 +74,7 @@ class ObjectLock
 
     /**
      * @param boolean $fullLocked
+     * @return $this
      */
     public function setFullLocked($fullLocked)
     {
