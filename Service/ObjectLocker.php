@@ -8,7 +8,7 @@ use EP\DoctrineLockBundle\Params\ObjectLockParams;
 use EP\DoctrineLockBundle\Entity\ObjectLock;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-class ObjectLocker
+class ObjectLocker implements ObjectLockerInterface
 {
     /**
      * @var EntityManager
