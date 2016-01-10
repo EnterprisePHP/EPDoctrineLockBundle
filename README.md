@@ -126,5 +126,49 @@ $objectLocker->isLocked(new DummyEntity(), ObjectLockParams::UPDATE_LOCK);
 $objectLocker = $container->get('ep.doctrine.object.locker');
 //lock object
 $objectLocker->lock(new DummyEntity());
-$em->persist(new DummyEntity()); //this will throw LockedObjectException
+$em->persist(new DummyEntity()); // this will throw LockedObjectException
+```
+
+Doctrine Entity Lock
+---------------------------
+#### Add Lockable annotation and lockable trait ####
+```php
+namespace AppBundle\Entity;
+
+use EP\DoctrineLockBundle\Traits\LockableTrait;
+use EP\DoctrineLockBundle\Annotations\Lockable;
+
+/**
+ * @Lockable
+ */
+class DummyEntity
+{
+    use LockableTrait;
+    // ...
+```
+#### Example Use ####
+```php
+//create new dummy entity
+$dummyEntity = new DummyEntity();
+$dummyEntity
+    ->setTitle('Dummy Entity Title')
+    ->setDescription('Dummy Entity Description')
+    ->setUpdateLocked(true) //lock entity for update process
+    ->setDeleteLocked(true) //lock entity for delete process
+;
+$em->persist($dummyEntity);
+$em->flush();
+
+$dummyEntity->setTitle('Update Dummy Entity Title');
+$em->persist($dummyEntity);
+$em->flush(); // this will throw LockedEntityException because entity have update lock
+
+$em->remove($dummyEntity); // this will throw LockedEntityException because entity have delete lock
+```
+##### Unlock Entity Lock #####
+```php
+//unlock update lock
+$dummyEntity->setUpdateLocked(false);
+//unlock delete lock
+$dummyEntity->setDeleteLocked(false);
 ```
