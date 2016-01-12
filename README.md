@@ -2,6 +2,7 @@
 - Lock objects against insert, delete, update events
 - Lock entities against delete, update events
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/9e66e05d-ff79-4a8b-9cb0-dd547f95c162/small.png)](https://insight.sensiolabs.com/projects/9e66e05d-ff79-4a8b-9cb0-dd547f95c162)
 [![knpbundles.com](http://knpbundles.com/EnterprisePHP/EPDoctrineLockBundle/badge-short)](http://knpbundles.com/EnterprisePHP/EPDoctrineLockBundle)
 
 ### Related Links;###
