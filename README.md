@@ -2,6 +2,8 @@
 - Lock objects against insert, delete, update events
 - Lock entities against delete, update events
 
+[![knpbundles.com](http://knpbundles.com/EnterprisePHP/EPDoctrineLockBundle/badge-short)](http://knpbundles.com/EnterprisePHP/EPDoctrineLockBundle)
+
 ### Related Links;###
   - https://github.com/doctrine/doctrine2/blob/master/docs/en/reference/transactions-and-concurrency.rst#locking-support
   - http://dev.mysql.com/doc/refman/5.7/en/lock-tables.html
