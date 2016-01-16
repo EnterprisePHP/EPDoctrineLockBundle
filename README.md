@@ -12,8 +12,8 @@
   - http://stackoverflow.com/questions/129329/optimistic-vs-pessimistic-locking
 <hr>
 
-- Developing steps can be follow from https://github.com/behramcelen/symfony-bundle-develop
-- An basic testing and logic command can be found in https://github.com/behramcelen/symfony-bundle-develop/blob/master/src/AppBundle/Command/LockBundleTestCommand.php#L41 
+- Development steps can be followed from https://github.com/behramcelen/symfony-bundle-develop
+- A basic test and logic command can be found in https://github.com/behramcelen/symfony-bundle-develop/blob/master/src/AppBundle/Command/LockBundleTestCommand.php#L41 
 
 
 Installation
@@ -22,7 +22,7 @@ Installation
 Step 1: Download the Bundle
 ---------------------------
 
-Open a command console, enter your project directory and execute the
+Open a command console, go to your project directory and execute the
 following command to download the latest version of this bundle:
 
 ```bash
@@ -79,7 +79,7 @@ $objectLocker->lock(new DummyEntity(), ObjectLockParams::INSERT_LOCK);
 //lock update process
 $objectLocker->lock(new DummyEntity(), ObjectLockParams::UPDATE_LOCK);
 ```
-Doctrine Object UnLock
+Doctrine Object Unlock
 ---------------------------
 ```php
 use EP\DoctrineLockBundle\Params\ObjectLockParams;
