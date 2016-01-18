@@ -196,5 +196,49 @@ class DoctrineEventSubscriber implements EventSubscriber
                 )
             );
         }
+
+        // Map delete locked by field
+        if (!$classMetadata->hasField('deleteLockedBy')) {
+            $classMetadata->mapField(
+                array(
+                    'fieldName' => 'deleteLockedBy',
+                    'type' => 'string',
+                    'nullable' => true
+                )
+            );
+        }
+
+        // Map update locked by field
+        if (!$classMetadata->hasField('updateLockedBy')) {
+            $classMetadata->mapField(
+                array(
+                    'fieldName' => 'updateLockedBy',
+                    'type' => 'string',
+                    'nullable' => true
+                )
+            );
+        }
+
+        // Map delete locked time field
+        if (!$classMetadata->hasField('deleteLockedTime')) {
+            $classMetadata->mapField(
+                array(
+                    'fieldName' => 'deleteLockedTime',
+                    'type' => 'date',
+                    'nullable' => true
+                )
+            );
+        }
+
+        // Map update locked time field
+        if (!$classMetadata->hasField('updateLockedTime')) {
+            $classMetadata->mapField(
+                array(
+                    'fieldName' => 'updateLockedTime',
+                    'type' => 'date',
+                    'nullable' => true
+                )
+            );
+        }
     }
 }
