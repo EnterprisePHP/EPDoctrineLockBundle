@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\MappingException;
 use EP\DoctrineLockBundle\Params\ObjectLockParams;
 use EP\DoctrineLockBundle\Entity\ObjectLock;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Doctrine\Common\Annotations\AnnotationReader;
 
 class ObjectLocker implements ObjectLockerInterface
 {
@@ -156,5 +157,31 @@ class ObjectLocker implements ObjectLockerInterface
         $this->em->persist($objectLock);
         $this->em->flush();
         return $objectLock;
+    }
+
+    /**
+     * @param $entity
+     * @return bool
+     */
+    public function isLockableEntity($entity)
+    {
+        $reader = new AnnotationReader();
+        $reflClass = new \ReflectionClass($entity);
+        $lockableAnnotation = $reader->getClassAnnotation($reflClass, 'EP\\DoctrineLockBundle\\Annotations\\Lockable');
+        if($lockableAnnotation == null){
+            return false;
+        }
+        if(!method_exists($entity, 'isUpdateLocked') || !method_exists($entity, 'isDeleteLocked')){
+            throw new \LogicException('Please use Lockable trait on '. $reflClass->getName());
+        }
+        return true;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    public function getEntityManager()
+    {
+        return $this->em;
     }
 }
