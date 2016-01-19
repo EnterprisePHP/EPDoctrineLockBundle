@@ -4,6 +4,7 @@ namespace EP\DoctrineLockBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use EP\DoctrineLockBundle\Annotations\Lockable;
 use EP\DoctrineLockBundle\Entity\ObjectLock;
 use EP\DoctrineLockBundle\Exception\LockedEntityException;
 use EP\DoctrineLockBundle\Exception\LockedObjectException;
@@ -89,7 +90,11 @@ class DoctrineEventSubscriber implements EventSubscriber
         if($isInsertLocked){
             throw new LockedObjectException('You tried delete entity an delete locked object');
         }
-        if(!$this->isLockableEntity($entity)){
+        $isLockableEntity = $this->isLockableEntity($entity);
+        if($isLockableEntity == false){
+            return;
+        }
+        if($isLockableEntity instanceof Lockable && $isLockableEntity->isPreDeleteCheckEnabled() == false){
             return;
         }
         if($entity->isDeleteLocked()){
@@ -122,7 +127,11 @@ class DoctrineEventSubscriber implements EventSubscriber
         if($isUpdateLocked){
             throw new LockedObjectException('You tried update row an update locked object');
         }
-        if(!$this->isLockableEntity($entity)){
+        $isLockableEntity = $this->isLockableEntity($entity);
+        if($isLockableEntity == false){
+            return;
+        }
+        if($isLockableEntity instanceof Lockable && $isLockableEntity->isPreUpdateCheckEnabled() == false){
             return;
         }
         if(isset($changeset['updateLocked'])){
@@ -172,7 +181,7 @@ class DoctrineEventSubscriber implements EventSubscriber
         if(!method_exists($entity, 'isUpdateLocked') || !method_exists($entity, 'isDeleteLocked')){
             throw new \LogicException('Please use Lockable trait on '. $reflClass->getName());
         }
-        return true;
+        return $lockableAnnotation;
     }
 
     /**
