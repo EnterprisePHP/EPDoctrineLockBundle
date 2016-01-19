@@ -13,4 +13,8 @@ interface ObjectLockerInterface
     public function switchLock($object, $lockType = ObjectLockParams::FULL_LOCK);
 
     public function isLocked($object, $lockType = ObjectLockParams::FULL_LOCK);
+
+    public function isLockableEntity($entity);
+
+    public function getEntityManager();
 }
