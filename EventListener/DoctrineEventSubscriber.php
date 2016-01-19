@@ -110,6 +110,8 @@ class DoctrineEventSubscriber implements EventSubscriber
             return;
         }
         $em = $args->getEntityManager();
+        $uow = $em->getUnitOfWork();
+        $changeset = $uow->getEntityChangeSet($entity);
         $objectLocker = new ObjectLocker($em, $this->accessor);
 
         $isFullLocked = $objectLocker->isLocked($entity);
@@ -121,6 +123,9 @@ class DoctrineEventSubscriber implements EventSubscriber
             throw new LockedObjectException('You tried update row an update locked object');
         }
         if(!$this->isLockableEntity($entity)){
+            return;
+        }
+        if(isset($changeset['updateLocked'])){
             return;
         }
         if($entity->isUpdateLocked()){
