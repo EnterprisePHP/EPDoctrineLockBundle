@@ -183,6 +183,7 @@ class DoctrineEventSubscriber implements EventSubscriber
                 array(
                     'fieldName' => 'updateLocked',
                     'type' => 'boolean',
+                    'nullable' => true,
                 )
             );
         }
@@ -193,6 +194,7 @@ class DoctrineEventSubscriber implements EventSubscriber
                 array(
                     'fieldName' => 'deleteLocked',
                     'type' => 'boolean',
+                    'nullable' => true,
                 )
             );
         }
