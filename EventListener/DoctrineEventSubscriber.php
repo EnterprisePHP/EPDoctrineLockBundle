@@ -240,7 +240,7 @@ class DoctrineEventSubscriber implements EventSubscriber
             $classMetadata->mapField(
                 array(
                     'fieldName' => 'deleteLockedTime',
-                    'type' => 'date',
+                    'type' => 'datetime',
                     'nullable' => true
                 )
             );
@@ -251,7 +251,7 @@ class DoctrineEventSubscriber implements EventSubscriber
             $classMetadata->mapField(
                 array(
                     'fieldName' => 'updateLockedTime',
-                    'type' => 'date',
+                    'type' => 'datetime',
                     'nullable' => true
                 )
             );
