@@ -3,16 +3,17 @@
 - Lock entities against delete, update events
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/9e66e05d-ff79-4a8b-9cb0-dd547f95c162/small.png)](https://insight.sensiolabs.com/projects/9e66e05d-ff79-4a8b-9cb0-dd547f95c162)
-[![knpbundles.com](http://knpbundles.com/EnterprisePHP/EPDisplayBundle/badge-short)](http://knpbundles.com/EnterprisePHP/EPDisplayBundle)
+[![knpbundles.com](http://knpbundles.com/EnterprisePHP/EPDoctrineLockBundle/badge-short)](http://knpbundles.com/EnterprisePHP/EPDoctrineLockBundle)
 
 ### Related Links;###
-  - https://github.com/ojs/ojs/issues/990
-  - https://github.com/ojs/ojs/blob/master/src/Ojs/CoreBundle/Service/Twig/DisplayExtension.php
+  - https://github.com/doctrine/doctrine2/blob/master/docs/en/reference/transactions-and-concurrency.rst#locking-support
+  - http://dev.mysql.com/doc/refman/5.7/en/lock-tables.html
+  - https://www.wikiwand.com/en/Lock_(database)
+  - http://stackoverflow.com/questions/129329/optimistic-vs-pessimistic-locking
 <hr>
 
 - Development steps can be followed from https://github.com/behramcelen/symfony-bundle-develop
-- A basic test and logic controller and view can be found in https://github.com/behramcelen/symfony-bundle-develop/blob/master/src/AppBundle/Controller/DisplayController.php#L16
-- https://github.com/behramcelen/symfony-bundle-develop/blob/master/src/AppBundle/Resources/views/Display/display.html.twig#L7
+- A basic test and logic command can be found in https://github.com/behramcelen/symfony-bundle-develop/blob/master/src/AppBundle/Command/LockBundleTestCommand.php#L41 
 
 
 Installation
@@ -25,7 +26,7 @@ Open a command console, go to your project directory and execute the
 following command to download the latest version of this bundle:
 
 ```bash
-$ composer require enterprisephp/display-bundle "dev-master"
+$ composer require enterprisephp/doctrine-lock-bundle "dev-master"
 ```
 
 This command requires you to have Composer installed globally, as explained
@@ -50,7 +51,7 @@ class AppKernel extends Kernel
         $bundles = array(
             // ...
 
-            new EP\DisplayBundle\EPDisplayBundle(),
+            new EP\DoctrineLockBundle\EPDoctrineLockBundle(),
         );
 
         // ...
@@ -59,35 +60,118 @@ class AppKernel extends Kernel
     // ...
 }
 ```
-DisplayTrait
--------------
-use DisplayTrait on which you want to display objects/entities (!important):
-```php
 
+Usage
+============
+
+Doctrine Object Lock
+---------------------------
+```php
+use EP\DoctrineLockBundle\Params\ObjectLockParams;
+// ...
+$objectLocker = $container->get('ep.doctrine.object.locker');
+//lock fully
+$objectLocker->lock(new DummyEntity());
+//lock delete process
+$objectLocker->lock(new DummyEntity(), ObjectLockParams::DELETE_LOCK);
+//lock insert process
+$objectLocker->lock(new DummyEntity(), ObjectLockParams::INSERT_LOCK);
+//lock update process
+$objectLocker->lock(new DummyEntity(), ObjectLockParams::UPDATE_LOCK);
+```
+Doctrine Object Unlock
+---------------------------
+```php
+use EP\DoctrineLockBundle\Params\ObjectLockParams;
+// ...
+$objectLocker = $container->get('ep.doctrine.object.locker');
+//unlock full lock
+$objectLocker->unlock(new DummyEntity());
+//unlock delete process
+$objectLocker->unlock(new DummyEntity(), ObjectLockParams::DELETE_LOCK);
+//unlock insert process
+$objectLocker->unlock(new DummyEntity(), ObjectLockParams::INSERT_LOCK);
+//unlock update process
+$objectLocker->unlock(new DummyEntity(), ObjectLockParams::UPDATE_LOCK);
+```
+Doctrine Object Switch Lock
+---------------------------
+```php
+use EP\DoctrineLockBundle\Params\ObjectLockParams;
+// ...
+$objectLocker = $container->get('ep.doctrine.object.locker');
+//switch full lock
+$objectLocker->switchLock(new DummyEntity());
+//switch delete process
+$objectLocker->switchLock(new DummyEntity(), ObjectLockParams::DELETE_LOCK);
+//switch insert process
+$objectLocker->switchLock(new DummyEntity(), ObjectLockParams::INSERT_LOCK);
+//unswitchlock update process
+$objectLocker->switchLock(new DummyEntity(), ObjectLockParams::UPDATE_LOCK);
+```
+Doctrine Object Is Locked
+---------------------------
+```php
+use EP\DoctrineLockBundle\Params\ObjectLockParams;
+// ...
+$objectLocker = $container->get('ep.doctrine.object.locker');
+//is full locked
+$objectLocker->isLocked(new DummyEntity());
+//is delete locked
+$objectLocker->isLocked(new DummyEntity(), ObjectLockParams::DELETE_LOCK);
+//is insert locked
+$objectLocker->isLocked(new DummyEntity(), ObjectLockParams::INSERT_LOCK);
+//is update locked
+$objectLocker->isLocked(new DummyEntity(), ObjectLockParams::UPDATE_LOCK);
+```
+### Example Use ###
+```php
+$objectLocker = $container->get('ep.doctrine.object.locker');
+//lock object
+$objectLocker->lock(new DummyEntity());
+$em->persist(new DummyEntity()); // this will throw LockedObjectException
+```
+
+Doctrine Entity Lock
+---------------------------
+#### Add Lockable annotation and lockable trait ####
+```php
 namespace AppBundle\Entity;
 
 use EP\DoctrineLockBundle\Traits\LockableTrait;
+use EP\DoctrineLockBundle\Annotations\Lockable;
 
-class MyEntity
+/**
+ * @Lockable
+ */
+class DummyEntity
 {
-    use DisplayTrait;
-}
+    use LockableTrait;
+    // ...
 ```
+#### Example Use ####
+```php
+//create new dummy entity
+$dummyEntity = new DummyEntity();
+$dummyEntity
+    ->setTitle('Dummy Entity Title')
+    ->setDescription('Dummy Entity Description')
+    ->setUpdateLocked(true) //lock entity for update process
+    ->setDeleteLocked(true) //lock entity for delete process
+;
+$em->persist($dummyEntity);
+$em->flush();
 
-Configuration
-=============
+$dummyEntity->setTitle('Update Dummy Entity Title');
+$em->persist($dummyEntity);
+$em->flush(); // this will throw LockedEntityException because entity have update lock
 
-Add below configs to `config.yml` file:
+$em->remove($dummyEntity); // this will throw LockedEntityException because entity have delete lock
 ```
-ep_display:
-    global:
-        image_render: true # (optinal) defaults to true
-        file_render: true # (optinal) defaults to true
-        template: EPDisplayBundle::display.html.twig # (optinal) defaults to EPDisplayBundle:display.html.twig template
-        exclude_vars: # (optinal) defaults to empty array
-            - excludeField
-            - hiddenField
-            - password
-        array_collection_render: true # (optinal) defaults to true
-        collection_item_count: 5 # (optinal) defaults to 10
+##### Unlock Entity Lock #####
+```php
+//unlock update lock
+$dummyEntity->setUpdateLocked(false);
+//unlock delete lock
+$dummyEntity->setDeleteLocked(false);
 ```
